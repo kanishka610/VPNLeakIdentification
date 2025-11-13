@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "VPN Leak Detector",
+  "version": "1.0",
+  "description": "Automatically detects VPN leaks when visiting YouTube",
+  "permissions": [
+    "tabs",
+    "webNavigation",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.youtube.com/*",
+    "https://a3412e272b54.ngrok-free.app/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_title": "VPN Leak Detector - Click to open dashboard"
+  }
+}

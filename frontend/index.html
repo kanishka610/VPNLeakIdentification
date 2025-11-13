@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Leak Detector</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔒 VPN Leak Detector</h1>
+            <p>Monitor your VPN connection for leaks in real-time</p>
+        </header>
+
+        <div class="controls">
+            <button id="startMonitor" class="btn btn-primary">Start Monitoring</button>
+            <button id="stopMonitor" class="btn btn-danger">Stop Monitoring</button>
+            <a href="dashboard.html" class="btn btn-success">Live Dashboard</a>
+        </div>
+
+        <div class="status-container">
+            <div class="status-card">
+                <h3>Monitoring Status</h3>
+                <div id="monitoringStatus" class="status offline">OFFLINE</div>
+                <div id="lastCheck">Last check: Never</div>
+            </div>
+
+            <div class="results-card">
+                <h3>Detection Results</h3>
+                <div id="results">
+                    <p class="no-results">No results yet. Start monitoring to see results.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>How It Works:</h3>
+            <ul>
+                <li>Install the browser extension</li>
+                <li>Visit YouTube.com</li>
+                <li>VPN detection runs automatically</li>
+                <li>Check Live Dashboard for real-time results</li>
+                <li>Get alerts if your real IP is exposed</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

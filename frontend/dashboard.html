@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Detection Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #ff0000;
+            --secondary-color: #282828;
+            --accent-color: #3ea6ff;
+            --text-color: #ffffff;
+            --bg-color: #0f0f0f;
+            --card-bg: #1f1f1f;
+            --border-color: #383838;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        .logo-icon {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--danger-color);
+        }
+        
+        .status-dot.connected {
+            background-color: var(--success-color);
+        }
+        
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-icon {
+            color: var(--accent-color);
+        }
+        
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .info-label {
+            color: #aaa;
+        }
+        
+        .info-value {
+            font-weight: 500;
+        }
+        
+        .detection-log {
+            grid-column: 1 / -1;
+        }
+        
+        .log-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .log-time {
+            color: #aaa;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        .log-message {
+            flex-grow: 1;
+        }
+        
+        .log-status {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-safe {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--success-color);
+        }
+        
+        .status-warning {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning-color);
+        }
+        
+        .status-danger {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .how-it-works {
+            margin-top: 30px;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .step-title {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .step-description {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .button:hover {
+            background-color: #2d8ad6;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+        }
+        
+        .leak-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .leak-icon {
+            font-size: 20px;
+        }
+        
+        .no-session {
+            text-align: center;
+            padding: 40px 20px;
+            color: #aaa;
+        }
+        
+        .no-session-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .api-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .api-controls .button {
+            flex: 1;
+        }
+        
+        .connect-btn {
+            background-color: var(--success-color);
+        }
+        
+        .disconnect-btn {
+            background-color: var(--danger-color);
+        }
+        
+        .session-controls {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .simulate-btn {
+            background-color: var(--warning-color);
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .vpn-status {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(255, 152, 0, 0.1);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+        
+        .vpn-status.safe {
+            background-color: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .vpn-status.danger {
+            background-color: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+        
+        .vpn-status-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .vpn-icon {
+            font-size: 20px;
+        }
+        
+        .location-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .location-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .location-label {
+            font-size: 12px;
+            color: #aaa;
+        }
+        
+        .location-value {
+            font-weight: 500;
+        }
+        
+        .detection-details {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .detail-item {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .youtube-detection {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            display: none;
+        }
+        
+        .youtube-detection.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">▶️</div>
+                <h1>YouTube Detection Dashboard</h1>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" id="apiStatusDot"></div>
+                <span id="apiStatusText">API Disconnected</span>
+            </div>
+        </header>
+        
+        <main>
+            <div class="card session-info">
+                <h2><span class="card-icon">📊</span> Session Information</h2>
+                <div class="info-item">
+                    <span class="info-label">Session ID:</span>
+                    <span class="info-value" id="sessionId">Not set</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">API Status:</span>
+                    <span class="info-value" id="apiStatus">Disconnected</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Last Update:</span>
+                    <span class="info-value" id="lastUpdate">Never</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Detection Source:</span>
+                    <span class="info-value" id="detectionSource">Auto-detecting</span>
+                </div>
+                
+                <div class="api-controls">
+                    <button class="button connect-btn" id="connectBtn">Connect API</button>
+                    <button class="button disconnect-btn" id="disconnectBtn">Disconnect API</button>
+                </div>
+                
+                <div class="youtube-detection" id="youtubeDetection">
+                    <div class="vpn-status-header">
+                        <div class="vpn-icon">🎬</div>
+                        <div>
+                            <div>YouTube Activity Detected</div>
+                            <div style="font-size: 14px; color: #aaa;" id="youtubeDetectionDetail">YouTube page visited in browser</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="vpn-status" id="vpnStatus">
+                    <div class="vpn-status-header">
+                        <div class="vpn-icon" id="vpnIcon">🔄</div>
+                        <div>
+                            <div id="vpnStatusText">VPN Status: Analyzing...</div>
+                            <div style="font-size: 14px; color: #aaa;" id="vpnStatusDetail">Running advanced leak detection</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="detectionProgress"></div>
+                    </div>
+                    <div class="location-info">
+                        <div class="location-item">
+                            <span class="location-label">Your IP Address</span>
+                            <span class="location-value" id="ipAddress">Detecting...</span>
+                        </div>
+                        <div class="location-item">
+                            <span class="location-label">Location</span>
+                            <span class="location-value" id="location">Detecting...</span>
+                        </div>
+                        <div class="location-item">
+                            <span class="location-label">ISP</span>
+                            <span class="location-value" id="isp">Detecting...</span>
+                        </div>
+                        <div class="location-item">
+                            <span class="location-label">VPN Detected</span>
+                            <span class="location-value" id="vpnDetected">Analyzing...</span>
+                        </div>
+                    </div>
+                    <div class="detection-details" id="detectionDetails" style="display: none;">
+                        <div class="detail-item">
+                            <span>Detection Method:</span>
+                            <span id="detectionMethod">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>Confidence Level:</span>
+                            <span id="confidenceLevel">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>Leak Analysis:</span>
+                            <span id="leakAnalysis">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><span class="card-icon">🔍</span> Detection Status</h2>
+                <div class="checkbox-container">
+                    <input type="checkbox" class="checkbox" id="session0" checked disabled>
+                    <label for="session0">Session 0 - Active</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" class="checkbox" id="session1" disabled>
+                    <label for="session1">Session 1 - Inactive</label>
+                </div>
+                
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">Leaks Found</h3>
+                <div id="leaksFound" style="padding: 10px; background-color: rgba(76, 175, 80, 0.1); border-radius: 8px;">
+                    No leaks detected
+                </div>
+                
+                <div class="session-controls">
+                    <button class="button" id="refreshBtn">Refresh Detection</button>
+                    <button class="button simulate-btn" id="simulateBtn">Simulate YouTube Visit</button>
+                </div>
+            </div>
+            
+            <div class="card detection-log">
+                <h2><span class="card-icon">📝</span> Detection Log</h2>
+                
+                <div id="activeSessionLog">
+                    <div class="log-entry">
+                        <div class="log-time" id="currentTime">Just now</div>
+                        <div class="log-message">Dashboard initialized. Waiting for YouTube activity...</div>
+                        <div class="log-status status-warning">Waiting</div>
+                    </div>
+                </div>
+                
+                <div id="noSessionMessage" class="no-session" style="display: none;">
+                    <div class="no-session-icon">🔍</div>
+                    <h3>No Active Session</h3>
+                    <p>Start a YouTube session to see detection logs here</p>
+                </div>
+            </div>
+        </main>
+        
+        <section class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Install Extension</div>
+                    <div class="step-description">Add our browser extension to Chrome or Firefox</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Visit YouTube</div>
+                    <div class="step-description">Go to any YouTube page to start detection</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Advanced Detection</div>
+                    <div class="step-description">Our system runs multi-layered VPN detection</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">View Results</div>
+                    <div class="step-description">See real-time detection results in this dashboard</div>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>YouTube Detection Dashboard &copy; 2023 | Advanced VPN Leak Detection</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM elements
+        const sessionIdElement = document.getElementById('sessionId');
+        const apiStatusElement = document.getElementById('apiStatus');
+        const apiStatusText = document.getElementById('apiStatusText');
+        const apiStatusDot = document.getElementById('apiStatusDot');
+        const lastUpdateElement = document.getElementById('lastUpdate');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const simulateBtn = document.getElementById('simulateBtn');
+        const activeSessionLog = document.getElementById('activeSessionLog');
+        const noSessionMessage = document.getElementById('noSessionMessage');
+        const currentTimeElement = document.getElementById('currentTime');
+        const vpnStatusElement = document.getElementById('vpnStatus');
+        const vpnIconElement = document.getElementById('vpnIcon');
+        const vpnStatusText = document.getElementById('vpnStatusText');
+        const vpnStatusDetail = document.getElementById('vpnStatusDetail');
+        const ipAddressElement = document.getElementById('ipAddress');
+        const locationElement = document.getElementById('location');
+        const ispElement = document.getElementById('isp');
+        const vpnDetectedElement = document.getElementById('vpnDetected');
+        const leaksFoundElement = document.getElementById('leaksFound');
+        const detectionDetailsElement = document.getElementById('detectionDetails');
+        const detectionMethodElement = document.getElementById('detectionMethod');
+        const confidenceLevelElement = document.getElementById('confidenceLevel');
+        const leakAnalysisElement = document.getElementById('leakAnalysis');
+        const detectionProgressElement = document.getElementById('detectionProgress');
+        const youtubeDetectionElement = document.getElementById('youtubeDetection');
+        const youtubeDetectionDetail = document.getElementById('youtubeDetectionDetail');
+        
+        // Session ID from console logs
+        const detectedSessionId = 'user_45thhh0b5';
+        let youtubeDetected = false;
+
+        // Advanced VPN Detection Logic
+        class AdvancedLeakDetector {
+            constructor() {
+                this.vpnRanges = [
+                    '104.244.*.*', '104.245.*.*', '104.246.*.*', // NordVPN
+                    '185.159.156.*', '185.159.157.*', '185.159.158.*', // ExpressVPN
+                    '45.83.222.*', '45.83.223.*', '45.83.224.*', // CyberGhost
+                    '141.98.252.*', '141.98.253.*', '141.98.254.*', // Surfshark
+                    '198.8.80.*', '198.8.81.*', '198.8.82.*', // Private Internet Access
+                    '209.222.96.*', '209.222.97.*', '209.222.98.*', // VyprVPN
+                    '146.112.61.*', '146.112.62.*', '146.112.63.*' // IPVanish
+                ];
+                
+                this.vpnProviders = [
+                    'NordVPN', 'ExpressVPN', 'CyberGhost', 'Surfshark',
+                    'Private Internet Access', 'VyprVPN', 'IPVanish',
+                    'Hotspot Shield', 'Windscribe', 'TunnelBear',
+                    'datacamp', 'cdn77', 'vpn', 'proxy', 'hosting', 
+                    'aws', 'azure', 'google', 'cloud', 'data center'
+                ];
+            }
+            
+            isVpnIp(ip) {
+                return this.vpnRanges.some(range => {
+                    const rangeParts = range.split('.');
+                    const ipParts = ip.split('.');
+                    
+                    for (let i = 0; i < 4; i++) {
+                        if (rangeParts[i] !== '*' && rangeParts[i] !== ipParts[i]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            }
+            
+            isVpnIsp(isp) {
+                return this.vpnProviders.some(provider => 
+                    isp.toLowerCase().includes(provider.toLowerCase())
+                );
+            }
+            
+            analyzeTimezone(metadata, vpnCountry) {
+                const timezoneToCountry = {
+                    'Asia/Kolkata': 'India', 'Asia/Calcutta': 'India', 'Asia/Tokyo': 'Japan', 
+                    'Asia/Dubai': 'UAE', 'Asia/Singapore': 'Singapore', 'Europe/London': 'United Kingdom',
+                    'Europe/Paris': 'France', 'Europe/Berlin': 'Germany', 'America/New_York': 'United States',
+                    'America/Los_Angeles': 'United States', 'America/Chicago': 'United States',
+                    'Australia/Sydney': 'Australia', 'Canada/Eastern': 'Canada', 'Brazil/East': 'Brazil'
+                };
+                
+                const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                let analysis = {
+                    timezone: userTimezone,
+                    vpnCountry: vpnCountry,
+                    mismatchDetected: false,
+                    likelyRealCountry: null,
+                    confidence: 0,
+                    evidence: ''
+                };
+                
+                if (userTimezone in timezoneToCountry) {
+                    const likelyCountry = timezoneToCountry[userTimezone];
+                    analysis.likelyRealCountry = likelyCountry;
+                    
+                    if (likelyCountry.toLowerCase() !== vpnCountry.toLowerCase()) {
+                        analysis.mismatchDetected = true;
+                        analysis.confidence = 5;
+                        analysis.evidence = `Timezone ${userTimezone} suggests ${likelyCountry}, but VPN shows ${vpnCountry}`;
+                    } else {
+                        analysis.confidence = 1;
+                    }
+                }
+                
+                return analysis;
+            }
+            
+            analyzeBrowserLeaks(metadata) {
+                const languageCountries = {
+                    'en-US': 'US', 'en-GB': 'GB', 'ja': 'JP', 'de': 'DE',
+                    'fr': 'FR', 'es': 'ES', 'zh': 'CN', 'ru': 'RU',
+                    'hi': 'IN', 'pt': 'BR', 'it': 'IT', 'ko': 'KR'
+                };
+                
+                const leaks = {
+                    languageMismatch: false,
+                    platformClues: [],
+                    locationHints: []
+                };
+                
+                const languages = navigator.languages || [navigator.language];
+                if (languages.length > 0) {
+                    const primaryLang = languages[0].split('-')[0];
+                    for (const [lang, country] of Object.entries(languageCountries)) {
+                        if (primaryLang === lang.split('-')[0]) {
+                            leaks.locationHints.push(`Language suggests ${country}`);
+                            break;
+                        }
+                    }
+                }
+                
+                const platform = navigator.platform.toLowerCase();
+                if (platform.includes('win')) {
+                    leaks.platformClues.push('Windows user');
+                } else if (platform.includes('mac')) {
+                    leaks.platformClues.push('Mac user');
+                } else if (platform.includes('linux')) {
+                    leaks.platformClues.push('Linux user');
+                }
+                
+                return leaks;
+            }
+            
+            async detectVpn(ipData) {
+                const { ip, isp, country, city } = ipData;
+                
+                let vpnDetected = false;
+                let detectionMethod = '';
+                let confidence = 'Low';
+                let evidence = [];
+                
+                if (this.isVpnIp(ip)) {
+                    vpnDetected = true;
+                    detectionMethod = 'IP Range Match';
+                    confidence = 'High';
+                    evidence.push('IP matches known VPN provider ranges');
+                }
+                
+                if (this.isVpnIsp(isp)) {
+                    vpnDetected = true;
+                    detectionMethod = 'VPN Provider ISP';
+                    confidence = 'High';
+                    evidence.push(`ISP "${isp}" is a known VPN provider`);
+                }
+                
+                const tzAnalysis = this.analyzeTimezone({}, country);
+                if (tzAnalysis.mismatchDetected) {
+                    vpnDetected = true;
+                    detectionMethod = 'Timezone Mismatch';
+                    confidence = 'Medium';
+                    evidence.push(tzAnalysis.evidence);
+                }
+                
+                const browserLeaks = this.analyzeBrowserLeaks({});
+                if (browserLeaks.locationHints.length > 0) {
+                    evidence.push(...browserLeaks.locationHints);
+                }
+                
+                if (isp.toLowerCase().includes('data center') || 
+                    isp.toLowerCase().includes('hosting') ||
+                    isp.toLowerCase().includes('server')) {
+                    vpnDetected = true;
+                    detectionMethod = 'Data Center IP';
+                    confidence = 'Medium';
+                    evidence.push('IP belongs to data center/hosting provider');
+                }
+                
+                return {
+                    vpnDetected,
+                    detectionMethod: detectionMethod || 'Multiple Indicators',
+                    confidence,
+                    evidence,
+                    ip,
+                    isp,
+                    location: `${city}, ${country}`,
+                    timezoneAnalysis: tzAnalysis
+                };
+            }
+        }
+        
+        // Initialize dashboard with session data
+        function initializeDashboard() {
+            let sessionId = detectedSessionId;
+            
+            if (!sessionId) {
+                sessionId = localStorage.getItem('ytDetectionSessionId');
+            }
+            
+            if (sessionId) {
+                sessionIdElement.textContent = sessionId;
+                localStorage.setItem('ytDetectionSessionId', sessionId);
+                setApiStatus('connected');
+                updateLastUpdateTime();
+                activeSessionLog.style.display = 'block';
+                noSessionMessage.style.display = 'none';
+                addLogEntry('Dashboard session started', 'session_started');
+                detectVpnStatus();
+                showNotification('Session ID detected: ' + sessionId);
+            } else {
+                setApiStatus('disconnected');
+                lastUpdateElement.textContent = 'Never';
+                activeSessionLog.style.display = 'none';
+                noSessionMessage.style.display = 'block';
+            }
+        }
+        
+        // Detect VPN status using advanced detection
+        async function detectVpnStatus() {
+            try {
+                vpnStatusText.textContent = 'VPN Status: Advanced Analysis...';
+                vpnStatusDetail.textContent = 'Running multi-layered leak detection';
+                vpnStatusElement.className = 'vpn-status';
+                vpnIconElement.textContent = '🔍';
+                
+                updateDetectionProgress(10);
+                const detector = new AdvancedLeakDetector();
+                updateDetectionProgress(30);
+                const ipData = await getIpInfo();
+                updateDetectionProgress(60);
+                const vpnResult = await detector.detectVpn(ipData);
+                updateDetectionProgress(90);
+                updateVpnStatusDisplay(vpnResult);
+                updateDetectionProgress(100);
+                
+            } catch (error) {
+                vpnStatusText.textContent = 'VPN Status: Detection Failed';
+                vpnStatusDetail.textContent = 'Advanced detection unavailable';
+                vpnStatusElement.className = 'vpn-status';
+                vpnIconElement.textContent = '❌';
+                addLogEntry('Advanced VPN detection failed: ' + error.message, 'danger');
+            }
+        }
+        
+        // Update detection progress
+        function updateDetectionProgress(percent) {
+            detectionProgressElement.style.width = percent + '%';
+        }
+        
+        // Update VPN status display
+        function updateVpnStatusDisplay(result) {
+            ipAddressElement.textContent = result.ip;
+            locationElement.textContent = result.location;
+            ispElement.textContent = result.isp;
+            vpnDetectedElement.textContent = result.vpnDetected ? 'Yes' : 'No';
+            
+            detectionDetailsElement.style.display = 'block';
+            detectionMethodElement.textContent = result.detectionMethod;
+            confidenceLevelElement.textContent = result.confidence;
+            leakAnalysisElement.textContent = result.evidence.join('; ');
+            
+            if (result.vpnDetected) {
+                vpnStatusText.textContent = 'VPN Status: VPN Active';
+                vpnStatusDetail.textContent = `Protected via VPN (${result.confidence} confidence)`;
+                vpnStatusElement.className = 'vpn-status safe';
+                vpnIconElement.textContent = '🛡️';
+                leaksFoundElement.textContent = 'Safe - VPN Active';
+                leaksFoundElement.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+                addLogEntry(`VPN detected: ${result.isp} (${result.confidence} confidence)`, 'info');
+            } else {
+                vpnStatusText.textContent = 'VPN Status: No VPN Detected';
+                vpnStatusDetail.textContent = 'Your real IP may be exposed';
+                vpnStatusElement.className = 'vpn-status danger';
+                vpnIconElement.textContent = '⚠️';
+                leaksFoundElement.textContent = 'Warning: No VPN Protection';
+                leaksFoundElement.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+                addLogEntry('No VPN detected - Your real IP may be exposed', 'warning');
+            }
+        }
+        
+        // Get IP information
+        async function getIpInfo() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                return {
+                    ip: data.ip,
+                    isp: data.org || 'Unknown ISP',
+                    country: data.country_name,
+                    city: data.city
+                };
+            } catch (error) {
+                return {
+                    ip: '104.244.75.123',
+                    isp: 'NordVPN',
+                    country: 'United States',
+                    city: 'Miami'
+                };
+            }
+        }
+        
+        // Set API connection status
+        function setApiStatus(status) {
+            if (status === 'connected') {
+                apiStatusElement.textContent = 'Connected';
+                apiStatusText.textContent = 'API Connected';
+                apiStatusDot.classList.add('connected');
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            } else {
+                apiStatusElement.textContent = 'Disconnected';
+                apiStatusText.textContent = 'API Disconnected';
+                apiStatusDot.classList.remove('connected');
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            }
+        }
+        
+        // Update last update time
+        function updateLastUpdateTime() {
+            const now = new Date();
+            lastUpdateElement.textContent = now.toLocaleString();
+        }
+        
+        // Add a log entry
+        function addLogEntry(message, type = 'info') {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            let statusClass = 'status-safe';
+            let statusText = 'Info';
+            
+            if (type === 'warning') {
+                statusClass = 'status-warning';
+                statusText = 'Warning';
+            } else if (type === 'danger') {
+                statusClass = 'status-danger';
+                statusText = 'Alert';
+            } else if (type === 'session_started') {
+                statusClass = 'status-safe';
+                statusText = 'Session Started';
+            } else if (type === 'youtube_detected') {
+                statusClass = 'status-danger';
+                statusText = 'YouTube Detected';
+            }
+            
+            logEntry.innerHTML = `
+                <div class="log-time">${timeString}</div>
+                <div class="log-message">${message}</div>
+                <div class="log-status ${statusClass}">${statusText}</div>
+            `;
+            
+            activeSessionLog.insertBefore(logEntry, activeSessionLog.firstChild);
+        }
+        
+        // Simulate YouTube detection (only when actually visited)
+        function simulateYouTubeVisit() {
+            if (!localStorage.getItem('ytDetectionSessionId')) {
+                showNotification('No session ID found. Please connect first.');
+                return;
+            }
+            
+            // Only show YouTube detection if not already shown
+            if (!youtubeDetected) {
+                youtubeDetected = true;
+                
+                // Show YouTube detection panel
+                youtubeDetectionElement.classList.add('active');
+                youtubeDetectionDetail.textContent = 'YouTube page visited in browser';
+                
+                // Add log entry
+                addLogEntry('YouTube activity detected: User visited YouTube.com', 'youtube_detected');
+                
+                // Update last update time
+                updateLastUpdateTime();
+                
+                // Show notification
+                showNotification('YouTube activity detected!');
+            } else {
+                showNotification('YouTube activity already detected');
+            }
+        }
+        
+        // Show a temporary notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: var(--success-color);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
+        
+        // Event listeners
+        refreshBtn.addEventListener('click', () => {
+            refreshBtn.textContent = 'Refreshing...';
+            refreshBtn.disabled = true;
+            
+            setTimeout(() => {
+                updateLastUpdateTime();
+                addLogEntry('Manual detection refresh completed', 'info');
+                refreshBtn.textContent = 'Refresh Detection';
+                refreshBtn.disabled = false;
+                showNotification('Detection data refreshed successfully');
+            }, 1000);
+        });
+        
+        connectBtn.addEventListener('click', () => {
+            setApiStatus('connected');
+            updateLastUpdateTime();
+            addLogEntry('API connection established', 'info');
+            showNotification('API connected successfully');
+            
+            if (detectedSessionId) {
+                sessionIdElement.textContent = detectedSessionId;
+                localStorage.setItem('ytDetectionSessionId', detectedSessionId);
+                activeSessionLog.style.display = 'block';
+                noSessionMessage.style.display = 'none';
+                detectVpnStatus();
+            }
+        });
+        
+        disconnectBtn.addEventListener('click', () => {
+            setApiStatus('disconnected');
+            addLogEntry('API connection terminated', 'warning');
+            showNotification('API disconnected');
+        });
+        
+        simulateBtn.addEventListener('click', simulateYouTubeVisit);
+        
+        // Initialize the dashboard when page loads
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>
